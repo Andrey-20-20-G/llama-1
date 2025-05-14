@@ -1,7 +1,7 @@
 from text_features import calculate_handcrafted_features, calculate_tfidf_features
 import pandas as pd
 
-df = pd.read_csv("data/dataset.csv")
+df = pd.read_csv("../data/dataset.csv")
 
 df_feats = calculate_handcrafted_features(df)
 print(df_feats.head())

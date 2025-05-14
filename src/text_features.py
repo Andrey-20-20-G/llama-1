@@ -13,7 +13,7 @@ nltk.download("punkt")
 nltk.download("stopwords")
 
 
-STOP_WORDS = set(stopwords.words('english'))
+STOP_WORDS = set(stopwords.words('russian'))
 
 
 def remove_punctuation(text):

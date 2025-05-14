@@ -18,8 +18,8 @@ from scipy.sparse import hstack
 from text_features import lexical_features  # из предыдущего модуля
 
 
-MODEL_PATH = "models/rf_classifier.joblib"
-SCALER_PATH = "models/scaler.joblib"
+MODEL_PATH = "../models/rf_classifier.joblib"
+SCALER_PATH = "../models/scaler.joblib"
 
 
 def extract_text_from_pdf(pdf_path):
@@ -73,7 +73,7 @@ def convert_proba_to_label(prob: float) -> str:
         return "🟩 Написано человеком"
 
 
-def run_inference(pdf_path, tfidf_vocab_path="models/tfidf_vocab.joblib"):
+def run_inference(pdf_path, tfidf_vocab_path="../models/tfidf_vocab.joblib"):
     print("[INFO] Загружаем модели...")
     model = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
@@ -85,7 +85,7 @@ def run_inference(pdf_path, tfidf_vocab_path="models/tfidf_vocab.joblib"):
     result, proba = predict_class(text, tfidf_vocab, model, scaler)
 
     print(f"\n✅ Классификация: {result}")
-    # print(f"🔢 Вероятность, что ИИ: {proba:.4f}")
+    print(f"🔢 Вероятность, что ИИ: {proba:.4f}")
 
 
 if __name__ == "__main__":
