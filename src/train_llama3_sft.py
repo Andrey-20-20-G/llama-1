@@ -409,7 +409,7 @@ from trl import SFTTrainer
 import torch
 
 MODEL_NAME = "openchat/openchat-3.5-0106"
-DATA_PATH = "data/llama_train.json"
+DATA_PATH = "../data/llama_train.json"
 
 # Загружаем модель и токенизатор
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_fast=True)
@@ -438,7 +438,7 @@ dataset = load_dataset("json", data_files=DATA_PATH, split="train")
 
 # Аргументы обучения
 training_args = TrainingArguments(
-    output_dir="./models/llama3-finetuned",
+    output_dir="../models/llama3-finetuned",
     per_device_train_batch_size=1,
     num_train_epochs=2,
     gradient_accumulation_steps=4,
@@ -462,5 +462,5 @@ trainer = SFTTrainer(
 )
 
 trainer.train()
-# trainer.save_model("./models/llama3-finetuned")
-tokenizer.save_pretrained("models/llama3-complete")
+trainer.save_model("../models/llama3-finetuned")
+tokenizer.save_pretrained("../models/llama3-complete")

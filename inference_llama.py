@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import AutoPeftModelForCausalLM
 import tempfile
 
-MODEL_PATH = "models/llama3-finetuned"  # Путь к дообученной LLaMA-3 или OpenChat
+MODEL_PATH = "../models/llama3-finetuned"  # Путь к дообученной LLaMA-3 или OpenChat
 
 
 def extract_text_from_pdf(pdf_path: str) -> str:
