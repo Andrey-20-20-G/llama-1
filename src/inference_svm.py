@@ -17,9 +17,9 @@ from scipy.sparse import hstack
 
 from text_features import lexical_features  # из предыдущего модуля
 
-
-MODEL_PATH = "models/rf_classifier.joblib"
+MODEL_PATH = "models/svm_classifier.joblib"
 SCALER_PATH = "models/scaler.joblib"
+TFIDF_PATH = "models/tfidf_vocab.joblib"
 
 
 def extract_text_from_pdf(pdf_path):
@@ -31,7 +31,7 @@ def extract_text_from_pdf(pdf_path):
 
 def predict_class(text: str, tfidf_vocab: list, model, scaler):
     """
-    Возвращает предсказание класса и вероятность
+    Возвращает предсказание класса и вероятность или аналог уверенности.
     """
 
     # 1. TF-IDF
@@ -40,7 +40,7 @@ def predict_class(text: str, tfidf_vocab: list, model, scaler):
 
     # 2. Hand-crafted features
     feats = lexical_features(text)
-    feat_array = scaler.transform([[
+    feat_array = np.array([[
         feats['n_sentences'],
         feats['n_words'],
         feats['avg_word_length'],
@@ -48,20 +48,29 @@ def predict_class(text: str, tfidf_vocab: list, model, scaler):
         feats['unique_tokens'],
         feats['stopword_ratio']
     ]])
+    scaled_feats = scaler.transform(feat_array)
 
-    # 3. Combine features
-    x_combined = hstack([X_tfidf, feat_array])
+    # 3. Объединяем признаки
+    x_combined = hstack([X_tfidf, scaled_feats])
 
-    # 4. Prediction
-    proba = model.predict_proba(x_combined)[0][1]  # вероятность "ИИ"
-    pred_label = convert_proba_to_label(proba)
+    # 4. Предсказание
+    pred_label = model.predict(x_combined)[0]
 
-    return pred_label, proba
+    # Если у модели есть predict_proba
+    if hasattr(model, "predict_proba"):
+        proba = model.predict_proba(x_combined)[0][1]
+    else:
+        # Используем decision_function и логистическую функцию для оценки вероятности
+        score = model.decision_function(x_combined)[0]
+        proba = 1 / (1 + np.exp(-abs(score)))  # псевдо-вероятность
+
+    readable_label = convert_proba_to_label(proba)
+    return readable_label, proba
 
 
 def convert_proba_to_label(prob: float) -> str:
     """
-    Интерпретирует вероятность в категорию.
+    Интерпретирует вероятность в категорию (градиент оценки).
     """
     if prob >= 0.9:
         return "🟥 Написано ИИ"
@@ -73,7 +82,7 @@ def convert_proba_to_label(prob: float) -> str:
         return "🟩 Написано человеком"
 
 
-def run_inference(pdf_path, tfidf_vocab_path="models/tfidf_vocab.joblib"):
+def run_inference(pdf_path, tfidf_vocab_path=TFIDF_PATH):
     print("[INFO] Загружаем модели...")
     model = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
@@ -81,6 +90,10 @@ def run_inference(pdf_path, tfidf_vocab_path="models/tfidf_vocab.joblib"):
 
     print(f"[INFO] Загружаем файл {pdf_path}...")
     text = extract_text_from_pdf(pdf_path)
+
+    if not text.strip():
+        print("[ERROR] PDF файл пустой или не удалось распознать текст.")
+        return
 
     result, proba = predict_class(text, tfidf_vocab, model, scaler)
 

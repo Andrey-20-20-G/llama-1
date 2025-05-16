@@ -17,7 +17,7 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'models', 'rf_classif
 
 def train_models():
     print("[INFO] Загружаем датасет...")
-    df = pd.read_csv("../data/dataset.csv")
+    df = pd.read_csv("data/dataset.csv")
 
     # 1. Вычисляем признаки
     df_feats = calculate_handcrafted_features(df)
@@ -59,8 +59,8 @@ def train_models():
     # 8. Сохраняем модель
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     joblib.dump(clf, MODEL_PATH)
-    joblib.dump(scaler, '../models/scaler.joblib')
-    joblib.dump(tfidf_features, '../models/tfidf_vocab.joblib')  # Добавить
+    joblib.dump(scaler, 'models/scaler.joblib')
+    joblib.dump(tfidf_features, 'models/tfidf_vocab.joblib')  # Добавить
     print(f"[INFO] Модель сохранена в {MODEL_PATH}")
 
 

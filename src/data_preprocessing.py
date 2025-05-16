@@ -46,7 +46,7 @@ def create_dataset():
     return df
 
 
-def save_dataset(df: pd.DataFrame, out_path='../data/dataset.csv'):
+def save_dataset(df: pd.DataFrame, out_path='data/dataset.csv'):
     df.to_csv(out_path, index=False)
     print(f"[INFO] Датасет сохранён в {out_path}")
 
